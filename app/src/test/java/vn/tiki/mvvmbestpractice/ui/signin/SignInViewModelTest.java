@@ -1,5 +1,7 @@
 package vn.tiki.mvvmbestpractice.ui.signin;
 
+import android.databinding.Observable;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,7 +20,7 @@ public class SignInViewModelTest {
     }
 
     @Test
-    public void testSigIn() throws Exception {
+    public void shouldShowLoading() {
 
     }
 }

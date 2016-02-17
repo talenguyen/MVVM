@@ -1,5 +1,6 @@
 package vn.tiki.mvvmbestpractice.ui.signin;
 
+import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 
 import rx.Observable;
@@ -11,8 +12,14 @@ import rx.functions.Func0;
  * Created by tale on 2/16/16.
  */
 public class SignInViewModel {
-    public ObservableField<Boolean> processing = new ObservableField<>();
-    public ObservableField<Boolean> error = new ObservableField<>();
+
+    /**
+     * Logic
+     * 1. call sign must: show loading
+     * 2. Bind result: if error -> show error or show success otherwise.
+     */
+    public ObservableBoolean processing = new ObservableBoolean();
+    public ObservableBoolean error = new ObservableBoolean();
     public ObservableField<String> errorMessage = new ObservableField<>();
 
     public Observable<CharSequence> sigIn(CharSequence email, CharSequence pass) {

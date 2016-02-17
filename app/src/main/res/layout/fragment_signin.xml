@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -30,13 +31,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:visibility="@{viewModel.processing ? View.INVISIBLE : View.VISIBLE}"
+            android:visibility="@{viewModel.processing ? View.GONE : View.VISIBLE}"
             >
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{viewModel.errorMessage}"
+                tools:text="Email or password not matched"
+                android:textColor="@android:color/holo_red_light"
                 android:visibility="@{viewModel.error ? View.VISIBLE : View.INVISIBLE}" />
 
             <EditText
