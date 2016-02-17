@@ -17,6 +17,7 @@ import vn.tiki.mvvmbestpractice.R;
 import vn.tiki.mvvmbestpractice.base.BaseFragment;
 import vn.tiki.mvvmbestpractice.databinding.FragmentSigninBinding;
 import vn.tiki.mvvmbestpractice.event.SignInEvent;
+import vn.tiki.mvvmbestpractice.util.ThreadScheduler;
 
 /**
  * Created by tale on 2/16/16.
@@ -30,25 +31,45 @@ public class SignInFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_signin, container, false);
-        viewModel = new SignInViewModel();
+        viewModel = new SignInViewModel(new ThreadScheduler(Schedulers.io(), AndroidSchedulers.mainThread()));
         binding.setViewModel(viewModel);
         binding.setHandler(this);
+        bindLoading();
         return binding.getRoot();
     }
 
-    public void signIn(View view) {
-        viewModel.sigIn(binding.etEmail.getText(), binding.etPassword.getText())
-                .subscribeOn(Schedulers.io())
+    private void bindLoading() {
+        viewModel.processing.startWith(false)
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean loading) {
+                        binding.from.setVisibility(loading ? View.GONE : View.VISIBLE);
+                        binding.loading.setVisibility(loading ? View.VISIBLE :View.GONE);
+                    }
+                });
+        viewModel.error.startWith(false)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean error) {
+                        binding.tvError.setVisibility(error ? View.VISIBLE : View.INVISIBLE);
+                    }
+                });
+    }
+
+    public void signIn(View view) {
+        viewModel.signIn(binding.etEmail.getText(), binding.etPassword.getText())
                 .subscribe(new Action1<CharSequence>() {
                     @Override
                     public void call(CharSequence charSequence) {
+                        Log.d(TAG, "call onNext onThread: " + Thread.currentThread().getName());
                         EventBus.getDefault().post(new SignInEvent(true, charSequence.toString()));
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        Log.e(TAG, "call: SignIn error", throwable);
+                        Log.e(TAG, "call: SignIn errorField", throwable);
                     }
                 });
     }

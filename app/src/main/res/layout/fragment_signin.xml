@@ -28,19 +28,18 @@
         android:padding="@dimen/activity_horizontal_margin">
 
         <LinearLayout
+            android:id="@+id/from"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:visibility="@{viewModel.processing ? View.GONE : View.VISIBLE}"
-            >
+            android:orientation="vertical">
 
             <TextView
+                android:id="@+id/tvError"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{viewModel.errorMessage}"
-                tools:text="Email or password not matched"
                 android:textColor="@android:color/holo_red_light"
-                android:visibility="@{viewModel.error ? View.VISIBLE : View.INVISIBLE}" />
+                tools:text="Email or password not matched" />
 
             <EditText
                 android:id="@+id/et_email"
@@ -65,10 +64,10 @@
         </LinearLayout>
 
         <ProgressBar
+            android:id="@+id/loading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:visibility="@{viewModel.processing ? View.VISIBLE : View.GONE}" />
+            android:layout_centerInParent="true" />
 
     </RelativeLayout>
 

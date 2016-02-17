@@ -1,50 +1,64 @@
 package vn.tiki.mvvmbestpractice.ui.signin;
 
-import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 
 import rx.Observable;
-import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func0;
+import rx.subjects.BehaviorSubject;
+import vn.tiki.mvvmbestpractice.util.ThreadScheduler;
 
 /**
  * Created by tale on 2/16/16.
  */
 public class SignInViewModel {
-
     /**
      * Logic
      * 1. call sign must: show loading
      * 2. Bind result: if error -> show error or show success otherwise.
      */
-    public ObservableBoolean processing = new ObservableBoolean();
-    public ObservableBoolean error = new ObservableBoolean();
+    public BehaviorSubject<Boolean> processing = BehaviorSubject.create();
+    public BehaviorSubject<Boolean> error = BehaviorSubject.create();
     public ObservableField<String> errorMessage = new ObservableField<>();
 
-    public Observable<CharSequence> sigIn(CharSequence email, CharSequence pass) {
+    private final ThreadScheduler threadScheduler;
+
+    public SignInViewModel(ThreadScheduler threadScheduler) {
+        this.threadScheduler = threadScheduler;
+        processing.startWith(false)
+    }
+
+    public Observable<CharSequence> signIn(CharSequence email, CharSequence pass) {
+        showLoading();
         return signInTask(email, pass)
-                .doOnSubscribe(new Action0() {
-                    @Override
-                    public void call() {
-                        error.set(false);
-                        processing.set(true);
-                    }
-                })
+                .compose(threadScheduler.<CharSequence>transformer())
                 .doOnNext(new Action1<CharSequence>() {
                     @Override
                     public void call(CharSequence charSequence) {
-                        processing.set(false);
+                        hideLoading();
                     }
                 })
                 .doOnError(new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        processing.set(false);
-                        error.set(true);
-                        errorMessage.set(throwable.getMessage());
+                        hideLoading();
+                        showError(throwable);
                     }
                 });
+    }
+
+    private void showError(Throwable throwable) {
+        error.onNext(true);
+        errorMessage.set(throwable.getMessage());
+    }
+
+    private void hideLoading() {
+        processing.onNext(false);
+    }
+
+    private void showLoading() {
+        error.onNext(false);
+        processing.onNext(true);
     }
 
     private Observable<CharSequence> signInTask(final CharSequence email, final CharSequence pass) {
