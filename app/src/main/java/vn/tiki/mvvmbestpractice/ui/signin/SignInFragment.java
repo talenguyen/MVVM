@@ -18,6 +18,8 @@ import vn.tiki.mvvmbestpractice.base.BaseFragment;
 import vn.tiki.mvvmbestpractice.databinding.FragmentSigninBinding;
 import vn.tiki.mvvmbestpractice.event.SignInEvent;
 
+import static vn.tiki.mvvmbestpractice.util.BindingUtils.bindVisibility;
+
 /**
  * Created by tale on 2/16/16.
  */
@@ -36,6 +38,13 @@ public class SignInFragment extends BaseFragment {
         return binding.getRoot();
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        bindVisibility(binding.form, viewModel.getFormVisibility());
+        bindVisibility(binding.progressBar, viewModel.getProcessVisibility());
+    }
+
     public void signIn(View view) {
         viewModel.signIn(binding.etEmail.getText(), binding.etPassword.getText())
                 .subscribeOn(Schedulers.io())
@@ -52,4 +61,6 @@ public class SignInFragment extends BaseFragment {
                     }
                 });
     }
+
+
 }

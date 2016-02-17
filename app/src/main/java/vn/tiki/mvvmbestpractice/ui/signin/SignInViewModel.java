@@ -8,7 +8,7 @@ import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func0;
-import vn.tiki.mvvmbestpractice.util.CustomObservableInt;
+import rx.subjects.BehaviorSubject;
 
 /**
  * Created by tale on 2/16/16.
@@ -16,16 +16,30 @@ import vn.tiki.mvvmbestpractice.util.CustomObservableInt;
 public class SignInViewModel {
     public ObservableInt errorVisibility = new ObservableInt(View.GONE);
     public ObservableField<String> errorMessage = new ObservableField<>();
-    public CustomObservableInt formVisibility = new CustomObservableInt(View.VISIBLE);
-    public CustomObservableInt processVisibility = new CustomObservableInt(View.GONE);
+    private BehaviorSubject<Integer> mFormVisibility = BehaviorSubject.create(View.VISIBLE);
+    private BehaviorSubject<Integer> mProcessVisibility = BehaviorSubject.create(View.GONE);
+
+    /**
+     * use this getter for encapsulation, prevent calling onNext()
+     */
+    public Observable<Integer> getFormVisibility() {
+        return mFormVisibility.asObservable();
+    }
+
+    /**
+     * use this getter for encapsulation, prevent calling onNext()
+     */
+    public Observable<Integer> getProcessVisibility() {
+        return mProcessVisibility.asObservable();
+    }
 
     private void setErrorVisibility(boolean hasError) {
         errorVisibility.set(hasError ? View.VISIBLE : View.GONE);
     }
 
     private void setProcessVisibility(boolean showProgress) {
-        processVisibility.set(showProgress ? View.VISIBLE : View.GONE);
-        formVisibility.set(showProgress ? View.GONE : View.VISIBLE);
+        mProcessVisibility.onNext(showProgress ? View.VISIBLE : View.GONE);
+        mFormVisibility.onNext(showProgress ? View.GONE : View.VISIBLE);
     }
 
     public Observable<CharSequence> signIn(CharSequence email, CharSequence pass) {
