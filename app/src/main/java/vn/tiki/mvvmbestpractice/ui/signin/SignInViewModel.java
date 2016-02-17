@@ -1,47 +1,67 @@
 package vn.tiki.mvvmbestpractice.ui.signin;
 
-import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
+import android.databinding.ObservableInt;
+import android.view.View;
 
 import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func0;
+import rx.subjects.BehaviorSubject;
 
 /**
  * Created by tale on 2/16/16.
  */
 public class SignInViewModel {
+    public ObservableInt errorVisibility = new ObservableInt(View.GONE);
+    public ObservableField<String> errorMessage = new ObservableField<>();
+    private BehaviorSubject<Integer> mFormVisibility = BehaviorSubject.create(View.VISIBLE);
+    private BehaviorSubject<Integer> mProcessVisibility = BehaviorSubject.create(View.GONE);
 
     /**
-     * Logic
-     * 1. call sign must: show loading
-     * 2. Bind result: if error -> show error or show success otherwise.
+     * use this getter for encapsulation, prevent calling onNext()
      */
-    public ObservableBoolean processing = new ObservableBoolean();
-    public ObservableBoolean error = new ObservableBoolean();
-    public ObservableField<String> errorMessage = new ObservableField<>();
+    public Observable<Integer> getFormVisibility() {
+        return mFormVisibility.asObservable();
+    }
 
-    public Observable<CharSequence> sigIn(CharSequence email, CharSequence pass) {
+    /**
+     * use this getter for encapsulation, prevent calling onNext()
+     */
+    public Observable<Integer> getProcessVisibility() {
+        return mProcessVisibility.asObservable();
+    }
+
+    private void setErrorVisibility(boolean hasError) {
+        errorVisibility.set(hasError ? View.VISIBLE : View.GONE);
+    }
+
+    private void setProcessVisibility(boolean showProgress) {
+        mProcessVisibility.onNext(showProgress ? View.VISIBLE : View.GONE);
+        mFormVisibility.onNext(showProgress ? View.GONE : View.VISIBLE);
+    }
+
+    public Observable<CharSequence> signIn(CharSequence email, CharSequence pass) {
         return signInTask(email, pass)
                 .doOnSubscribe(new Action0() {
                     @Override
                     public void call() {
-                        error.set(false);
-                        processing.set(true);
+                        setErrorVisibility(false);
+                        setProcessVisibility(true);
                     }
                 })
                 .doOnNext(new Action1<CharSequence>() {
                     @Override
                     public void call(CharSequence charSequence) {
-                        processing.set(false);
+                        setProcessVisibility(false);
                     }
                 })
                 .doOnError(new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        processing.set(false);
-                        error.set(true);
+                        setProcessVisibility(false);
+                        setErrorVisibility(true);
                         errorMessage.set(throwable.getMessage());
                     }
                 });
