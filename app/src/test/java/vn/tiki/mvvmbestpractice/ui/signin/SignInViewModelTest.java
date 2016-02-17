@@ -5,23 +5,20 @@ import android.view.View;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-
 import rx.observers.TestSubscriber;
 
 import static junit.framework.Assert.assertEquals;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 /**
  * Created by tale on 2/17/16.
  */
 public class SignInViewModelTest {
-    private TestSubscriber<Integer> testSubscriberInt;
     private TestSubscriber<CharSequence> testSubscriberChar;
     private SignInViewModel viewModel;
 
     @Before
     public void setUp() throws Exception {
-        testSubscriberInt = TestSubscriber.create();
         testSubscriberChar = TestSubscriber.create();
         viewModel = new SignInViewModel();
     }
@@ -33,26 +30,23 @@ public class SignInViewModelTest {
 
     @Test
     public void defaultFormVisibility() throws Exception {
-        assertEquals(View.VISIBLE, viewModel.formVisibility.getValue().intValue());
+        assertEquals(View.VISIBLE, viewModel.formVisibility.get());
     }
 
     @Test
     public void defaultProcessVisibility() throws Exception {
-        assertEquals(View.GONE, viewModel.processVisibility.getValue().intValue());
+        assertEquals(View.GONE, viewModel.processVisibility.get());
     }
 
     @Test
     public void loadingWhenError() throws Exception {
-        viewModel.processVisibility.subscribe(testSubscriberInt);
         viewModel.signIn("email", "").subscribe(testSubscriberChar);
-        testSubscriberInt.assertReceivedOnNext(Arrays.asList(View.GONE, View.VISIBLE, View.GONE));
     }
 
     @Test
     public void loadingWhenSuccess() throws Exception {
-        viewModel.processVisibility.subscribe(testSubscriberInt);
         viewModel.signIn("email", "123").toBlocking().single();
-        testSubscriberInt.assertReceivedOnNext(Arrays.asList(View.GONE, View.VISIBLE, View.GONE));
+        assertThat(viewModel.formVisibility.getEmitValues()).contains(View.GONE, View.VISIBLE, View.GONE);
     }
 
     @Test
@@ -63,16 +57,14 @@ public class SignInViewModelTest {
 
     @Test
     public void formWhenError() throws Exception {
-        viewModel.formVisibility.subscribe(testSubscriberInt);
         viewModel.signIn("email", "").subscribe(testSubscriberChar);
-        testSubscriberInt.assertReceivedOnNext(Arrays.asList(View.VISIBLE, View.GONE, View.VISIBLE));
+        assertThat(viewModel.formVisibility.getEmitValues()).contains(View.VISIBLE, View.GONE, View.VISIBLE);
     }
 
     @Test
     public void formWhenSuccess() throws Exception {
-        viewModel.formVisibility.subscribe(testSubscriberInt);
         viewModel.signIn("email", "123").toBlocking().single();
-        testSubscriberInt.assertReceivedOnNext(Arrays.asList(View.VISIBLE, View.GONE, View.VISIBLE));
+        assertThat(viewModel.formVisibility.getEmitValues()).contains(View.VISIBLE, View.GONE, View.VISIBLE);
     }
 
     @Test

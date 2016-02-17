@@ -8,7 +8,7 @@ import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func0;
-import rx.subjects.BehaviorSubject;
+import vn.tiki.mvvmbestpractice.util.CustomObservableInt;
 
 /**
  * Created by tale on 2/16/16.
@@ -16,16 +16,16 @@ import rx.subjects.BehaviorSubject;
 public class SignInViewModel {
     public ObservableInt errorVisibility = new ObservableInt(View.GONE);
     public ObservableField<String> errorMessage = new ObservableField<>();
-    public BehaviorSubject<Integer> formVisibility = BehaviorSubject.create(View.VISIBLE);
-    public BehaviorSubject<Integer> processVisibility = BehaviorSubject.create(View.GONE);
+    public CustomObservableInt formVisibility = new CustomObservableInt(View.VISIBLE);
+    public CustomObservableInt processVisibility = new CustomObservableInt(View.GONE);
 
     private void setErrorVisibility(boolean hasError) {
         errorVisibility.set(hasError ? View.VISIBLE : View.GONE);
     }
 
     private void setProcessVisibility(boolean showProgress) {
-        processVisibility.onNext(showProgress ? View.VISIBLE : View.GONE);
-        formVisibility.onNext(showProgress ? View.GONE : View.VISIBLE);
+        processVisibility.set(showProgress ? View.VISIBLE : View.GONE);
+        formVisibility.set(showProgress ? View.GONE : View.VISIBLE);
     }
 
     public Observable<CharSequence> signIn(CharSequence email, CharSequence pass) {

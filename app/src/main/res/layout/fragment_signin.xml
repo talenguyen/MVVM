@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            app:visibility="@{viewModel.formVisibility}">
+            android:visibility="@{viewModel.formVisibility}">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -64,6 +64,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            app:visibility="@{viewModel.processVisibility}"/>
+            android:visibility="@{viewModel.processVisibility}"/>
     </RelativeLayout>
 </layout>
