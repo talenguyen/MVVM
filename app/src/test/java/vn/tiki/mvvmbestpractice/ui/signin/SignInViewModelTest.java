@@ -5,6 +5,9 @@ import android.view.View;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import rx.observers.TestSubscriber;
 
 import static junit.framework.Assert.assertEquals;
@@ -15,12 +18,14 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
  */
 public class SignInViewModelTest {
     private TestSubscriber<CharSequence> testSubscriberChar;
+    private List<Integer> receivedList;
     private SignInViewModel viewModel;
 
     @Before
     public void setUp() throws Exception {
         testSubscriberChar = TestSubscriber.create();
         viewModel = new SignInViewModel();
+        receivedList = new ArrayList<>();
     }
 
     @Test
@@ -40,13 +45,16 @@ public class SignInViewModelTest {
 
     @Test
     public void loadingWhenError() throws Exception {
+        viewModel.processVisibility.startReceivedValues(receivedList);
         viewModel.signIn("email", "").subscribe(testSubscriberChar);
+        assertThat(receivedList).contains(View.VISIBLE, View.GONE);
     }
 
     @Test
     public void loadingWhenSuccess() throws Exception {
+        viewModel.processVisibility.startReceivedValues(receivedList);
         viewModel.signIn("email", "123").toBlocking().single();
-        assertThat(viewModel.formVisibility.getEmitValues()).contains(View.GONE, View.VISIBLE, View.GONE);
+        assertThat(receivedList).contains(View.VISIBLE, View.GONE);
     }
 
     @Test
@@ -57,14 +65,16 @@ public class SignInViewModelTest {
 
     @Test
     public void formWhenError() throws Exception {
+        viewModel.formVisibility.startReceivedValues(receivedList);
         viewModel.signIn("email", "").subscribe(testSubscriberChar);
-        assertThat(viewModel.formVisibility.getEmitValues()).contains(View.VISIBLE, View.GONE, View.VISIBLE);
+        assertThat(receivedList).contains(View.GONE, View.VISIBLE);
     }
 
     @Test
     public void formWhenSuccess() throws Exception {
+        viewModel.formVisibility.startReceivedValues(receivedList);
         viewModel.signIn("email", "123").toBlocking().single();
-        assertThat(viewModel.formVisibility.getEmitValues()).contains(View.VISIBLE, View.GONE, View.VISIBLE);
+        assertThat(receivedList).contains(View.GONE, View.VISIBLE);
     }
 
     @Test
