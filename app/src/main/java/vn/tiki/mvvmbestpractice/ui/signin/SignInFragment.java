@@ -37,7 +37,7 @@ public class SignInFragment extends BaseFragment {
     }
 
     public void signIn(View view) {
-        viewModel.sigIn(binding.etEmail.getText(), binding.etPassword.getText())
+        viewModel.signIn(binding.etEmail.getText(), binding.etPassword.getText())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<CharSequence>() {
@@ -52,5 +52,4 @@ public class SignInFragment extends BaseFragment {
                     }
                 });
     }
-
 }
