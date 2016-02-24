@@ -1,5 +1,6 @@
 package vn.tiki.mvvmbestpractice.ui.signin;
 
+import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 
 import rx.Observable;
@@ -17,7 +18,7 @@ public class SignInViewModel {
      * 1. call sign must: show loading
      * 2. Bind result: if error -> show error or show success otherwise.
      */
-    public BehaviorSubject<Boolean> processing = BehaviorSubject.create();
+    public final ObservableBoolean processing = new ObservableBoolean(false);
     public BehaviorSubject<Boolean> error = BehaviorSubject.create();
     public ObservableField<String> errorMessage = new ObservableField<>();
 
@@ -25,7 +26,6 @@ public class SignInViewModel {
 
     public SignInViewModel(ThreadScheduler threadScheduler) {
         this.threadScheduler = threadScheduler;
-        processing.startWith(false)
     }
 
     public Observable<CharSequence> signIn(CharSequence email, CharSequence pass) {
@@ -52,13 +52,13 @@ public class SignInViewModel {
         errorMessage.set(throwable.getMessage());
     }
 
-    private void hideLoading() {
-        processing.onNext(false);
+    void hideLoading() {
+        processing.set(false);
     }
 
-    private void showLoading() {
+    void showLoading() {
         error.onNext(false);
-        processing.onNext(true);
+        processing.set(true);
     }
 
     private Observable<CharSequence> signInTask(final CharSequence email, final CharSequence pass) {

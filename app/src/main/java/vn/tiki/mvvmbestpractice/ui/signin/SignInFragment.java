@@ -39,15 +39,6 @@ public class SignInFragment extends BaseFragment {
     }
 
     private void bindLoading() {
-        viewModel.processing.startWith(false)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean loading) {
-                        binding.from.setVisibility(loading ? View.GONE : View.VISIBLE);
-                        binding.loading.setVisibility(loading ? View.VISIBLE :View.GONE);
-                    }
-                });
         viewModel.error.startWith(false)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<Boolean>() {

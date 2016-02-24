@@ -9,6 +9,11 @@ import java.util.List;
  */
 public class Transformers {
 
+
+    public interface TransformFunc<S, D> {
+        D transform(S source);
+    }
+
     public static <S, D> List<D> transform(List<S> source, TransformFunc<S, D> transformFunc) {
         if (transformFunc == null) {
             throw new NullPointerException("transformFunc must not be null");
